@@ -11,7 +11,7 @@ Import-Module Terminal-Icons -ErrorAction SilentlyContinue
 # ----------------------
 # INFO: Configure Starship prompt
 #
-$ENV:STARSHIP_CONFIG = "$HOME\.config\starship\.starship.toml"
+$ENV:STARSHIP_CONFIG = "$HOME\.config\starship\starship.toml"
 $ENV:STARSHIP_CACHE = "$HOME\.config\starship\cache"
 Invoke-Expression (& starship init powershell)
 
@@ -100,4 +100,9 @@ if (Get-Module PSReadLine) {
     } -ErrorAction SilentlyContinue
 } else {
     Write-Host "PSReadLine module not loaded; skipping configuration."
+}
+
+# Aliases
+function dot {
+    git --git-dir=$HOME\.dotfiles\ --work-tree=$HOME @args
 }
