@@ -1,4 +1,4 @@
-# Dotfiles
+# dotfiles
 My stuff.
 
 ## WindowsTerminal schema
@@ -7,4 +7,4 @@ This includes the following settings on:
 - Starship
 - PowerShell
 
-![WindowsTerminal](assets/WindowsTerminalLookAlike.png)
+![WindowsTerminal](assets/WindowsTerminalLookAlike.jpg)
