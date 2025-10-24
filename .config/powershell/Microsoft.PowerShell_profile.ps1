@@ -20,7 +20,7 @@ Invoke-Expression (& starship init powershell)
 # --------------------
 # INFO: Set Neovim configuration directory
 #
-$ENV:XDG_CONFIG_HOME = "$HOME\.config"
+$ENV:XDG_CONFIG_HOME = "$HOME\.config\nvim"
 
 # --------------------
 # OLLAMA CONFIGURATION
@@ -91,13 +91,15 @@ if (Get-Module PSReadLine) {
     Set-PSReadLineOption -PredictionViewStyle ListView -ErrorAction SilentlyContinue
 
     # Avoid adding 'git' commands to history
-    Set-PSReadLineOption -AddToHistoryHandler {
-        param ([string]$Line)
-        if ($Line -match "^git") {
-            return $false
-        }
-        return $true
-    } -ErrorAction SilentlyContinue
+	#### disabled by date --10/24/2025:
+    # Set-PSReadLineOption -AddToHistoryHandler {
+    #     param ([string]$Line)
+
+    #     if ($Line -match "^git") {
+    #         return $false
+    #     }
+    #     return $true
+    # } -ErrorAction SilentlyContinue
 } else {
     Write-Host "PSReadLine module not loaded; skipping configuration."
 }
