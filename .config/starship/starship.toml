@@ -37,7 +37,7 @@ $cmd_duration\
 $line_break\
 $character"""
 
-palette = 'palette1'
+palette = 'palette2'
 
 [palettes.palette1]
 text = "#ccccb5"
@@ -51,6 +51,19 @@ yellow = "#e74c3c"
 flamingo = "#8e44ad"
 lavender = "#16a085"
 blue = "#23a9d5"
+
+[palettes.palette2]
+text = "#f5f7f9"
+crust = "#0c1219"
+base = "#0b1014"
+
+red = "#CE3838"
+maroon = "#B13434"
+gold = "#D19B31"
+yellow = "#BF8732"
+flamingo = "#A94989"
+lavender = "#39ACA3"
+blue = "#31A6CB"
 
 #############
 # [MODULES] #
@@ -88,7 +101,7 @@ truncation_symbol = "⸫ "
 ssh_only = false
 format = '[ 𐋃 $localipv4 ]($style)'
 style = "bg:gold fg:crust"
-disabled = false
+disabled = true
 
 [git_branch]
 symbol = ""
@@ -135,7 +148,7 @@ format = '[[ $symbol ($version) (\($virtualenv\)) ](fg:crust bg:flamingo)]($styl
 # [TIME] #
 ##########
 [time]
-disabled = false
+disabled = true
 use_12hr = true
 utc_time_offset = "local"
 time_format = "%R"

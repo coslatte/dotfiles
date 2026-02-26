@@ -1,108 +1,81 @@
 # coslatte's PowerShell config :)
 
-# Suppress PowerShell update check notification
+# Global settings
 $env:POWERSHELL_UPDATECHECK = 'Off'
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
 
+# Modules
 Import-Module PSReadLine -ErrorAction SilentlyContinue
 Import-Module Terminal-Icons -ErrorAction SilentlyContinue
 
-# ----------------------
-# STARSHIP CONFIGURATION
-# ----------------------
-# INFO: Configure Starship prompt
-#
 $ENV:STARSHIP_CONFIG = "$HOME\.config\starship\starship.toml"
-$ENV:STARSHIP_CACHE = "$HOME\.config\starship\cache"
-Invoke-Expression (& starship init powershell)
+Invoke-Expression (& starship init powershell --print-full-init | Out-String)
 
-# --------------------
-# NEOVIM CONFIGURATION
-# --------------------
-# INFO: Set Neovim configuration directory
-#
+# Environment variables
 $ENV:XDG_CONFIG_HOME = "$HOME\.config"
-
-# --------------------
-# OLLAMA CONFIGURATION
-# --------------------
-# INFO: Custom configurations for Ollama
-#
 $ENV:OLLAMA_MODELS = ""
 
-# ------------------
-# UTILITY FUNCTIONS!
-# ------------------
-# INFO: My custom utilities and stuff
-#
-function Update-TouchFile {
-    <# Unix simulation 'touch' command. #>
-
-    param (
-        [Parameter(Mandatory = $true)]
-        [string]$File
-    )
-    if (Test-Path $File) {
-        Set-ItemProperty -Path $File -Name LastWriteTime -Value (Get-Date)
-    }
-    else {
-        New-Item -ItemType File -Path $File | Out-Null
+# PSReadLine configuration
+if (Get-Module PSReadLine) {
+    Set-PSReadLineOption -PredictionSource History
+    Set-PSReadLineOption -PredictionViewStyle ListView
+    Set-PSReadLineOption -AddToHistoryHandler {
+        param ([string]$Line)
+        return $Line -notmatch "^git"
     }
 }
-Set-Alias -Name touch -Value Update-TouchFile
 
-function Set-LocationAndList {
-    <# Change directory and list contents #>
+# --- Shortcuts & Functions ---
 
-    param (
-        [Parameter(Mandatory=$false, Position=0)]
-        [string]$Path = $PWD
-    )
-    Set-Location $Path
-    Get-ChildItem
+# Kill process by port
+function kp($port) {
+    $connections = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | 
+                   Where-Object { $_.OwningProcess -gt 0 }
+    if ($connections) {
+        foreach ($conn in $connections) {
+            try {
+                Stop-Process -Id $conn.OwningProcess -Force -ErrorAction Stop
+                Write-Host "Process $($conn.OwningProcess) on port $port deleted." -ForegroundColor Green
+            } catch {
+                Write-Warning "Access denied to process $($conn.OwningProcess). Run as Admin."
+            }
+        }
+    } else {
+        Write-Warning "No process listening on port $port."
+    }
 }
-Set-Alias -Name cdd -Value Set-LocationAndList
 
-function Get-AdaptiveListing {
-    <# Shows full info on wide terminals, compact on narrow ones #>
+# Unix 'touch'
+function touch($file) {
+    if (Test-Path $file) {
+        Set-ItemProperty -Path $file -Name LastWriteTime -Value (Get-Date)
+    } else {
+        New-Item -ItemType File -Path $file | Out-Null
+    }
+}
 
-    param(
-        [Parameter(ValueFromRemainingArguments=$true)]
-        $Path
-    )
-    $termWidth = $Host.UI.RawUI.WindowSize.Width
-    $items = if ($Path) { Get-ChildItem @Path } else { Get-ChildItem }
-    
-    if ($termWidth -lt 100) {
-        # Compact mode: Name and icon only, in wide format (multiple columns)
+# Change directory and list
+function cdd($path = $PWD) {
+    Set-Location $path
+    ls
+}
+
+# Adaptive listing
+function lsa {
+    param([Parameter(ValueFromRemainingArguments=$true)]$path)
+    $items = if ($path) { Get-ChildItem @path } else { Get-ChildItem }
+    if ($Host.UI.RawUI.WindowSize.Width -lt 100) {
         $items | Format-Wide -Property Name -AutoSize
     } else {
-        # Full mode: Standard table with all info (Mode, Date, Size, Name with icons)
         $items | Format-Table -AutoSize
     }
 }
-Remove-Item Alias:ls -Force -ErrorAction SilentlyContinue
-Set-Alias -Name ls -Value Get-AdaptiveListing
-$PSDefaultParameterValues['Format-Table:AutoSize'] = $true  # Default format settings for tables
 
-# PSReadLine settings
-# -------------------
-if (Get-Module PSReadLine) {
-    Set-PSReadLineOption -PredictionSource History -ErrorAction SilentlyContinue
-    Set-PSReadLineOption -PredictionViewStyle ListView -ErrorAction SilentlyContinue
+# Replace default ls with adaptive listing
+if (Test-Path Alias:ls) { Remove-Item Alias:ls -Force }
+Set-Alias -Name ls -Value lsa
 
-    # Avoid adding 'git' commands to history
-    Set-PSReadLineOption -AddToHistoryHandler {
-        param ([string]$Line)
-        if ($Line -match "^git") {
-            return $false
-        }
-        return $true
-    } -ErrorAction SilentlyContinue
-} else {
-    Write-Host "PSReadLine module not loaded; skipping configuration."
-}
-
-# Aliases
+# Dotfiles management
 function dot {
     git --git-dir=$HOME\.dotfiles\ --work-tree=$HOME @args
 }
