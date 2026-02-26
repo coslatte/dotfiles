@@ -5,34 +5,33 @@ format = """
 [▟](fg:red)\
 $os\
 $username\
-[▛](fg:red bg:maroon)\
+$memory_usage\
+[▛](fg:red bg:gold)\
 
-[▟](fg:maroon bg:red)\
+[▟](fg:gold bg:red)\
 $directory\
-[▛](fg:maroon bg:gold)\
+[▛](fg:gold bg:green)\
 
-[▟](fg:gold bg:maroon)\
-$localip\
-[▛](fg:gold bg:yellow)\
-
-[▟](fg:yellow bg:gold)\
+[▟](fg:green bg:gold)\
 $git_branch\
 $git_status\
 $git_metrics\
-[▛](fg:yellow bg:flamingo)\
+[▛](fg:green bg:violet)\
 
-[▟](fg:flamingo bg:yellow)\
+[▟](fg:violet bg:green)\
+$package\
 $c\
 $rust\
 $nodejs\
 $java\
 $python\
-[▛](fg:flamingo bg:lavender)\
+$lua\
+[▛](fg:violet bg:paper)\
 
-[▟](fg:lavender bg:flamingo)\
+[▟](fg:paper bg:violet)\
 $time\
 
-[▛](fg:lavender)\
+[▛](fg:paper)\
 $cmd_duration\
 $line_break\
 $character"""
@@ -45,12 +44,13 @@ crust = "#151a21"
 base = "#1b2028"
 
 red = "#e74c3c"
-maroon = "#c0392b"
+red_deep = "#ec8b14ff"
+blue = "#23a9d5"
+green = "#6dd393"
 gold = "#f39c12"
 yellow = "#e74c3c"
 flamingo = "#8e44ad"
 lavender = "#16a085"
-blue = "#23a9d5"
 
 [palettes.palette2]
 text = "#f5f7f9"
@@ -71,7 +71,7 @@ blue = "#31A6CB"
 [os]
 disabled = false
 style = "bg:red fg:crust"
-format = '[ $symbol]($style)'
+format = '[ $symbol ]($style)'
 
 [os.symbols]
 Windows = "󰍲"
@@ -81,10 +81,10 @@ Linux = "󰌽"
 show_always = true
 style_user = "bg:red fg:crust"
 style_root = "bg:red fg:crust"
-format = '[ $user ]($style)'
+format = '[$user ]($style)'
 
 [directory]
-style = "bg:maroon fg:crust"
+style = "bg:gold fg:crust"
 format = "[ $path ]($style)"
 truncation_length = 4
 truncate_to_repo = true
@@ -98,51 +98,66 @@ truncation_symbol = "⸫ "
 "Developer" = "󰲋 "
 
 [localip]
+disabled = true
 ssh_only = false
 format = '[ 𐋃 $localipv4 ]($style)'
 style = "bg:gold fg:crust"
-disabled = true
 
 [git_branch]
+disabled = false
 symbol = ""
-style = "bg:yellow"
-format = '[[ $symbol $branch ](fg:crust bg:yellow)]($style)'
+style = "bg:amber"
+format = '[[ $symbol $branch ](fg:crust bg:green)]($style)'
 
 [git_status]
-style = "bg:yellow"
-format = '[[($all_status $ahead_behind)](fg:crust bg:yellow)]($style)'
+disabled = false
+style = "bg:amber"
+format = '[[($all_status $ahead_behind)](fg:crust bg:green)]($style)'
 
 [git_metrics]
-added_style = 'bg:blue fg:crust'
-format = '[+$added]($added_style)/[-$deleted]($deleted_style) '
+disabled = true
+added_style = 'bg:green fg:crust'
+deleted_style = 'bg:green fg:gold'
+format = '[+$added]($added_style)/[-$deleted]($deleted_style)'
+
+[package]
+disabled = false
+symbol = "🗁 "
+style = "208 bold"
+format = '[ $symbol $version ]($style)'
 
 ##########################
 # [PROGRAMING LANGUAGES] #
 ##########################
 [nodejs]
 symbol = ""
-style = "bg:flamingo"
-format = '[[ $symbol($version) ](fg:crust bg:flamingo)]($style)'
+style = "bg:violet"
+format = '[[ $symbol($version) ](fg:crust bg:violet)]($style)'
 
 [c]
 symbol = ""
-style = "bg:flamingo"
-format = '[[ $symbol ($version) ](fg:crust bg:flamingo)]($style)'
+style = "bg:violet"
+format = '[[ $symbol ($version) ](fg:crust bg:violet)]($style)'
 
 [java]
 symbol = ""
-style = "bg:flamingo"
-format = '[[ $symbol (Java v$version) ](fg:crust bg:flamingo)]($style)'
+style = "bg:violet"
+format = '[[ $symbol (Java v$version) ](fg:crust bg:violet)]($style)'
 
 [rust]
 symbol = ""
-style = "bg:flamingo"
-format = '[[ $symbol ($version) ](fg:crust bg:flamingo)]($style)'
+style = "bg:violet"
+format = '[[ $symbol ($version) ](fg:crust bg:violet)]($style)'
 
 [python]
 symbol = ""
-style = "bg:flamingo"
-format = '[[ $symbol ($version) (\($virtualenv\)) ](fg:crust bg:flamingo)]($style)'
+style = "bg:violet"
+format = '[[ $symbol ($version) (\($virtualenv\)) ](fg:crust bg:violet)]($style)'
+
+[lua]
+symbol = ""
+style = "bg:violet"
+format = '[[ $symbol ($version) ](fg:crust bg:violet)]($style)'
 
 ##########
 # [TIME] #
@@ -151,9 +166,9 @@ format = '[[ $symbol ($version) (\($virtualenv\)) ](fg:crust bg:flamingo)]($styl
 disabled = true
 use_12hr = true
 utc_time_offset = "local"
-time_format = "%R"
+time_format = "%I:%M %p"
 style = "bg:lavender"
-format = '[[ t = $time ](fg:crust bg:lavender)]($style)'
+format = '[[ t = $time ](fg:crust bg:paper)]($style)'
 
 ######################
 # [COMMAND DURATION] #
@@ -176,8 +191,8 @@ disabled = false
 disabled = false
 success_symbol = '[✎](fg:blue)'
 error_symbol = '[✗](fg:red)'
-vimcmd_symbol = '[⟀](fg:flamingo)'
+vimcmd_symbol = '[⟀](fg:violet)'
 vimcmd_replace_one_symbol = '[⟀](italic fg:lavender)'
 vimcmd_replace_symbol = '[⟀](italic fg:lavender)'
-vimcmd_visual_symbol = '[⟀](italic fg:yellow)'
+vimcmd_visual_symbol = '[⟀](italic fg:amber)'
 
