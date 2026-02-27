@@ -18,6 +18,88 @@ vim.opt.scrolloff = 8           -- Keep 8 lines visible above/below cursor
 vim.opt.sidescrolloff = 8       -- Keep 8 columns visible left/right of cursor
 
 -- =============================
+-- VSCode theme integration
+-- Auto-bootstrap `vscode.nvim` colorscheme if missing, then apply it
+-- =============================
+-- Bootstrap lazy.nvim (auto-clone if missing) and register plugins
+do
+    local data = vim.fn.stdpath('data')
+    local dbgfile = data .. '/lazy-bootstrap.log'
+    local function dbg(msg)
+        local f = io.open(dbgfile, 'a')
+        if f then f:write(os.date('%Y-%m-%d %H:%M:%S') .. ' - ' .. tostring(msg) .. '\n'); f:close() end
+    end
+    dbg('bootstrap: start')
+    local lazypath = data .. '/lazy/lazy.nvim'
+
+    if not vim.loop.fs_stat(lazypath) then
+        dbg('lazy not found at ' .. lazypath)
+        if vim.fn.executable('git') == 1 then
+            dbg('git is executable, attempting clone')
+            local out = vim.fn.system({
+                'git', 'clone', '--filter=blob:none', 'https://github.com/folke/lazy.nvim.git', '--branch=stable', lazypath
+            })
+            dbg('git clone exit: ' .. tostring(vim.v.shell_error) .. ' output: ' .. tostring(out))
+        else
+            dbg('git not executable')
+            vim.notify('`git` not found — cannot bootstrap lazy.nvim', vim.log.levels.WARN)
+        end
+    else
+        dbg('lazy already present')
+    end
+
+    -- Ensure vscode.nvim exists inside lazy's plugins root so colorscheme can be applied immediately
+    local plugin_root = data .. '/lazy'
+    local vscode_path = plugin_root .. '/vscode.nvim'
+    if not vim.loop.fs_stat(vscode_path) then
+        dbg('vscode.nvim not found at ' .. vscode_path)
+        if vim.fn.executable('git') == 1 then
+            dbg('attempting clone vscode.nvim')
+            local out = vim.fn.system({'git', 'clone', '--depth', '1', 'https://github.com/Mofiqul/vscode.nvim.git', vscode_path})
+            dbg('vscode clone exit: ' .. tostring(vim.v.shell_error) .. ' output: ' .. tostring(out))
+            if vim.v.shell_error ~= 0 then
+                vim.notify('Failed to clone vscode.nvim: ' .. tostring(out), vim.log.levels.ERROR)
+            end
+        else
+            dbg('git not executable for vscode clone')
+            vim.notify('`git` not found — cannot auto-install vscode.nvim', vim.log.levels.WARN)
+        end
+    else
+        dbg('vscode.nvim already present')
+    end
+
+    vim.opt.rtp:prepend(lazypath)
+
+    local plugins = {
+        {
+            'Mofiqul/vscode.nvim',
+            lazy = false,
+            config = function()
+                vim.g.vscode_style = vim.g.vscode_style or 'dark'
+                if vim.g.vscode_style == 'light' then
+                    vim.opt.background = 'light'
+                else
+                    vim.opt.background = 'dark'
+                end
+                vim.cmd('colorscheme vscode')
+            end,
+        },
+    }
+
+    local ok, lazy = pcall(require, 'lazy')
+    dbg('require lazy ok: ' .. tostring(ok))
+    if not ok then
+        dbg('lazy require failed: ' .. tostring(lazy))
+        vim.notify('lazy.nvim not available; plugin setup skipped', vim.log.levels.WARN)
+    else
+        dbg('calling lazy.setup')
+        lazy.setup(plugins)
+        dbg('lazy.setup finished')
+    end
+    dbg('bootstrap: end')
+end
+
+-- =============================
 -- Neovide configuration
 -- (GUI-only; this section documents and groups Neovide-specific settings)
 -- =============================
@@ -107,5 +189,17 @@ vim.keymap.set('n', '<leader>w', ':w<CR>')
 
 -- Quit
 vim.keymap.set('n', '<leader>q', ':q<CR>')
+
+-- Fallback: ensure colorscheme is applied once Neovim has finished startup
+vim.api.nvim_create_autocmd('VimEnter', {
+    callback = function()
+        if vim.g.colors_name ~= 'vscode' then
+            local ok, err = pcall(vim.cmd, 'colorscheme vscode')
+            if not ok then
+                vim.notify('Could not apply colorscheme vscode: ' .. tostring(err), vim.log.levels.WARN)
+            end
+        end
+    end,
+})
 
 
