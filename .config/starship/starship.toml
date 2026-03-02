@@ -1,37 +1,27 @@
-# coslatte's starship template
+# coslatte - 2026
 
-# LEGO THEME
+# RGB SCHEMA (LEGO INHERITED)
 format = """
-[▟](fg:red)\
+[▟](fg:r)\
 $os\
 $username\
-$memory_usage\
-[▛](fg:red bg:gold)\
-
-[▟](fg:gold bg:red)\
 $directory\
-[▛](fg:gold bg:green)\
+[▛](fg:r bg:b)\
 
-[▟](fg:green bg:gold)\
+[▟](fg:b bg:r)\
 $git_branch\
 $git_status\
 $git_metrics\
-[▛](fg:green bg:violet)\
+[▛](fg:b bg:g)\
 
-[▟](fg:violet bg:green)\
-$package\
+[▟](fg:g bg:b)\
 $c\
 $rust\
 $nodejs\
 $java\
 $python\
-$lua\
-[▛](fg:violet bg:paper)\
 
-[▟](fg:paper bg:violet)\
-$time\
-
-[▛](fg:paper)\
+[▛](fg:g)\
 $cmd_duration\
 $line_break\
 $character"""
@@ -42,142 +32,116 @@ palette = 'palette2'
 text = "#ccccb5"
 crust = "#151a21"
 base = "#1b2028"
-
 red = "#e74c3c"
-red_deep = "#ec8b14ff"
-blue = "#23a9d5"
-green = "#6dd393"
+maroon = "#c0392b"
 gold = "#f39c12"
-yellow = "#e74c3c"
+orange = "#e76a3c"
 flamingo = "#8e44ad"
 lavender = "#16a085"
+new_blue = "#23a9d5"
+green = "#59ba70"
 
 [palettes.palette2]
 text = "#f5f7f9"
-crust = "#0c1219"
-base = "#0b1014"
-
-red = "#CE3838"
-maroon = "#B13434"
-gold = "#D19B31"
-yellow = "#BF8732"
-flamingo = "#A94989"
-lavender = "#39ACA3"
-blue = "#31A6CB"
+crust = "#172231"
+base = "#11191f"
+r = "#e03030"
+g = "#2fdd66"
+b = "#1c69d6"
 
 #############
 # [MODULES] #
 #############
 [os]
 disabled = false
-style = "bg:red fg:crust"
-format = '[ $symbol ]($style)'
+style = "bg:r fg:crust"
+format = '[ $symbol]($style)'
 
 [os.symbols]
-Windows = "󰍲"
-Linux = "󰌽"
+Windows = "󰍲 "
+Linux = "󰌽 "
 
 [username]
-show_always = true
-style_user = "bg:red fg:crust"
-style_root = "bg:red fg:crust"
-format = '[$user ]($style)'
+show_always = false
+style_user = "bg:r fg:crust"
+style_root = "bg:r fg:crust"
+format = '[ $user ]($style)'
 
 [directory]
-style = "bg:gold fg:crust"
+style = "bg:r fg:crust"
 format = "[ $path ]($style)"
 truncation_length = 4
 truncate_to_repo = true
 truncation_symbol = "⸫ "
 
 [directory.substitutions]
-"Documents" = "󰈙 "
-"Downloads" = " "
-"Music" = "󰝚 "
-"Pictures" = " "
-"Developer" = "󰲋 "
-
-[localip]
-disabled = true
-ssh_only = false
-format = '[ 𐋃 $localipv4 ]($style)'
-style = "bg:gold fg:crust"
+"Music" = " 󰝚"
+"Dev" = " 󰲋"
 
 [git_branch]
-disabled = false
 symbol = ""
-style = "bg:amber"
-format = '[[ $symbol $branch ](fg:crust bg:green)]($style)'
+style = "bg:b"
+format = '[[ $symbol $branch ](fg:crust bg:b)]($style)'
+disabled = false
 
 [git_status]
-disabled = false
-style = "bg:amber"
-format = '[[($all_status $ahead_behind)](fg:crust bg:green)]($style)'
+style = "bg:b"
+format = '[\[($all_status $ahead_behind)\](fg:crust bg:b)]($style)'
+disabled = true
 
 [git_metrics]
-disabled = true
-added_style = 'bg:green fg:crust'
-deleted_style = 'bg:green fg:gold'
-format = '[+$added]($added_style)/[-$deleted]($deleted_style)'
-
-[package]
+added_style = 'bg:b fg:g'
+deleted_style = 'bg:b fg:r'
+format = '[ \[+$added\]]($added_style)(bg:b fg:crust)[\[-$deleted\] ]($deleted_style)'
 disabled = false
-symbol = "🗁 "
-style = "208 bold"
-format = '[ $symbol $version ]($style)'
 
 ##########################
 # [PROGRAMING LANGUAGES] #
 ##########################
 [nodejs]
 symbol = ""
-style = "bg:violet"
-format = '[[ $symbol($version) ](fg:crust bg:violet)]($style)'
+style = "bg:g"
+format = '[[ $symbol ($version) ](fg:crust bg:g)]($style)'
 
 [c]
 symbol = ""
-style = "bg:violet"
-format = '[[ $symbol ($version) ](fg:crust bg:violet)]($style)'
+style = "bg:g"
+format = '[[ $symbol ($version) ](fg:crust bg:g)]($style)'
 
 [java]
 symbol = ""
-style = "bg:violet"
-format = '[[ $symbol (Java v$version) ](fg:crust bg:violet)]($style)'
+style = "bg:g"
+format = '[[ $symbol (Java v$version) ](fg:crust bg:g)]($style)'
 
 [rust]
 symbol = ""
-style = "bg:violet"
-format = '[[ $symbol ($version) ](fg:crust bg:violet)]($style)'
+style = "bg:g"
+format = '[[ $symbol ($version) ](fg:crust bg:g)]($style)'
 
 [python]
 symbol = ""
-style = "bg:violet"
-format = '[[ $symbol ($version) (\($virtualenv\)) ](fg:crust bg:violet)]($style)'
-
-[lua]
-symbol = ""
-style = "bg:violet"
-format = '[[ $symbol ($version) ](fg:crust bg:violet)]($style)'
+style = "bg:g"
+format = '[[ $symbol ($version) (\($virtualenv\)) ](fg:crust bg:g)]($style)'
 
 ##########
 # [TIME] #
 ##########
 [time]
-disabled = true
+disabled = false
 use_12hr = true
 utc_time_offset = "local"
-time_format = "%I:%M %p"
-style = "bg:lavender"
-format = '[[ t = $time ](fg:crust bg:paper)]($style)'
+time_format = "%R"
+style = "bg:r"
+format = '[[ t = $time ](fg:crust bg:r)]($style)'
 
 ######################
 # [COMMAND DURATION] #
 ######################
 [cmd_duration]
-show_milliseconds = true
-format = " ⯌ in $duration"
-style = "fg:crust"
 disabled = false
+show_milliseconds = true
+format = " ⯌ $duration"
+style = "fg:crust"
 show_notifications = true
 min_time_to_notify = 45000
 
@@ -189,10 +153,11 @@ disabled = false
 ###############
 [character]
 disabled = false
-success_symbol = '[✎](fg:blue)'
-error_symbol = '[✗](fg:red)'
-vimcmd_symbol = '[⟀](fg:violet)'
-vimcmd_replace_one_symbol = '[⟀](italic fg:lavender)'
-vimcmd_replace_symbol = '[⟀](italic fg:lavender)'
-vimcmd_visual_symbol = '[⟀](italic fg:amber)'
+success_symbol = '[✎](fg:g)'
+error_symbol = '[✗](fg:r)'
+vimcmd_symbol = '[⟀](fg:g)'
+vimcmd_replace_one_symbol = '[⟀](italic fg:g)'
+vimcmd_replace_symbol = '[⟀](italic fg:g)'
+vimcmd_visual_symbol = '[⟀](italic fg:g)'
+
 
