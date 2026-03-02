@@ -46,15 +46,15 @@ text = "#f5f7f9"
 crust = "#172231"
 base = "#11191f"
 r = "#e03030"
-g = "#2fdd66"
-b = "#1c69d6"
+g = "#2aca5d"
+b = "#1e64c6"
 
 #############
 # [MODULES] #
 #############
 [os]
 disabled = false
-style = "bg:r fg:crust"
+style = "bg:r fg:text"
 format = '[ $symbol]($style)'
 
 [os.symbols]
@@ -63,12 +63,12 @@ Linux = "󰌽 "
 
 [username]
 show_always = false
-style_user = "bg:r fg:crust"
-style_root = "bg:r fg:crust"
+style_user = "bg:r fg:text"
+style_root = "bg:r fg:text"
 format = '[ $user ]($style)'
 
 [directory]
-style = "bg:r fg:crust"
+style = "bg:r fg:text"
 format = "[ $path ]($style)"
 truncation_length = 4
 truncate_to_repo = true
@@ -81,18 +81,18 @@ truncation_symbol = "⸫ "
 [git_branch]
 symbol = ""
 style = "bg:b"
-format = '[[ $symbol $branch ](fg:crust bg:b)]($style)'
+format = '[[ $symbol $branch ](fg:text bg:b)]($style)'
 disabled = false
 
 [git_status]
 style = "bg:b"
-format = '[\[($all_status $ahead_behind)\](fg:crust bg:b)]($style)'
+format = '[\[($all_status $ahead_behind)\](fg:text bg:b)]($style)'
 disabled = true
 
 [git_metrics]
 added_style = 'bg:b fg:g'
 deleted_style = 'bg:b fg:r'
-format = '[ \[+$added\]]($added_style)(bg:b fg:crust)[\[-$deleted\] ]($deleted_style)'
+format = '[ \[+$added\]]($added_style)(bg:b fg:text)[\[-$deleted\] ]($deleted_style)'
 disabled = false
 
 ##########################
@@ -101,27 +101,27 @@ disabled = false
 [nodejs]
 symbol = ""
 style = "bg:g"
-format = '[[ $symbol ($version) ](fg:crust bg:g)]($style)'
+format = '[[ $symbol ($version) ](fg:text bg:g)]($style)'
 
 [c]
 symbol = ""
 style = "bg:g"
-format = '[[ $symbol ($version) ](fg:crust bg:g)]($style)'
+format = '[[ $symbol ($version) ](fg:text bg:g)]($style)'
 
 [java]
 symbol = ""
 style = "bg:g"
-format = '[[ $symbol (Java v$version) ](fg:crust bg:g)]($style)'
+format = '[[ $symbol (Java v$version) ](fg:text bg:g)]($style)'
 
 [rust]
 symbol = ""
 style = "bg:g"
-format = '[[ $symbol ($version) ](fg:crust bg:g)]($style)'
+format = '[[ $symbol ($version) ](fg:text bg:g)]($style)'
 
 [python]
 symbol = ""
 style = "bg:g"
-format = '[[ $symbol ($version) (\($virtualenv\)) ](fg:crust bg:g)]($style)'
+format = '[[ $symbol ($version) (\($virtualenv\)) ](fg:text bg:g)]($style)'
 
 ##########
 # [TIME] #
@@ -132,7 +132,7 @@ use_12hr = true
 utc_time_offset = "local"
 time_format = "%R"
 style = "bg:r"
-format = '[[ t = $time ](fg:crust bg:r)]($style)'
+format = '[[ t = $time ](fg:text bg:r)]($style)'
 
 ######################
 # [COMMAND DURATION] #
@@ -141,7 +141,7 @@ format = '[[ t = $time ](fg:crust bg:r)]($style)'
 disabled = false
 show_milliseconds = true
 format = " ⯌ $duration"
-style = "fg:crust"
+style = "fg:text"
 show_notifications = true
 min_time_to_notify = 45000
 
