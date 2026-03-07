@@ -1,6 +1,6 @@
 # coslatte - 2026
 
-# RGB SCHEMA (LEGO INHERITED)
+# RGB SCHEMA
 format = """
 [▟](fg:r)\
 $os\
@@ -26,22 +26,9 @@ $cmd_duration\
 $line_break\
 $character"""
 
-palette = 'palette2'
+palette = 'rgb'
 
-[palettes.palette1]
-text = "#ccccb5"
-crust = "#151a21"
-base = "#1b2028"
-red = "#e74c3c"
-maroon = "#c0392b"
-gold = "#f39c12"
-orange = "#e76a3c"
-flamingo = "#8e44ad"
-lavender = "#16a085"
-new_blue = "#23a9d5"
-green = "#59ba70"
-
-[palettes.palette2]
+[palettes.rgb]
 text = "#f5f7f9"
 crust = "#172231"
 base = "#11191f"

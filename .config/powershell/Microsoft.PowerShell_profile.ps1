@@ -62,20 +62,202 @@ function cdd($path = $PWD) {
 
 # Adaptive listing
 function lsa {
-    param([Parameter(ValueFromRemainingArguments=$true)]$path)
-    $items = if ($path) { Get-ChildItem @path } else { Get-ChildItem }
-    if ($Host.UI.RawUI.WindowSize.Width -lt 100) {
+    param([Parameter(ValueFromRemainingArguments=$true)]$args)
+    $items = if ($args) { Get-ChildItem @args } else { Get-ChildItem }
+    if ($Host.UI.RawUI.WindowSize.Width -lt 60) {
         $items | Format-Wide -Property Name -AutoSize
     } else {
         $items | Format-Table -AutoSize
     }
 }
+function ls {
+    param([Parameter(ValueFromRemainingArguments=$true)]$args)
+    if ($Host.UI.RawUI.WindowSize.Width -lt 60) {
+        lsa @args
+    } else {
+        Get-ChildItem @args | Format-Table -AutoSize
+    }
+}
 
-# Replace default ls with adaptive listing
-if (Test-Path Alias:ls) { Remove-Item Alias:ls -Force }
-Set-Alias -Name ls -Value lsa
+# Git commit shortcut: `gc "message"` -> git add -A && git commit -m "message"
+function gca {
+    param(
+        [Parameter(Mandatory=$true)][string]$Message,
+        [switch]$Force
+    )
 
-# Dotfiles management
-function dot {
-    git --git-dir=$HOME\.dotfiles\ --work-tree=$HOME @args
+    # Normalize and validate commit message
+    $Message = ($Message -replace "\r?\n"," ").Trim()
+    if ([string]::IsNullOrWhiteSpace($Message)) {
+        Write-Warning "Commit message is empty. Aborting."
+        return
+    }
+
+    # Verify git is available and we're inside a repository
+    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+        Write-Warning "git is not available in PATH."
+        return
+    }
+    $isRepo = & git rev-parse --is-inside-work-tree 2>$null
+    if ($LASTEXITCODE -ne 0 -or $isRepo -ne 'true') {
+        Write-Warning "Not inside a Git repository. Aborting."
+        return
+    }
+
+    # Ensure there are changes to commit
+    $status = & git status --porcelain
+    if (-not $status) {
+        Write-Host "No changes detected to commit." -ForegroundColor Yellow
+        return
+    }
+
+    # Stage all changes
+    & git add -A
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to stage changes (exit code $LASTEXITCODE)."
+        return
+    }
+
+    # Confirm (unless forced). Accept explicit 'y'/'yes' or whitespace-only (e.g. a single space).
+    if (-not $Force) {
+        $rawConfirm = Read-Host "Commit with message: '$Message'? [y/N]"
+        $trimmed = $rawConfirm.Trim()# coslatte's PowerShell config :)
+
+# Global settings
+$env:POWERSHELL_UPDATECHECK = 'Off'
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+
+# Modules
+Import-Module PSReadLine -ErrorAction SilentlyContinue
+Import-Module Terminal-Icons -ErrorAction SilentlyContinue
+
+$ENV:STARSHIP_CONFIG = "$HOME\.config\starship\starship.toml"
+Invoke-Expression (& starship init powershell --print-full-init | Out-String)
+
+# Environment variables
+$ENV:XDG_CONFIG_HOME = "$HOME\.config"
+$ENV:OLLAMA_MODELS = ""
+
+# PSReadLine configuration
+if (Get-Module PSReadLine) {
+    Set-PSReadLineOption -PredictionSource History
+    Set-PSReadLineOption -PredictionViewStyle ListView
+    Set-PSReadLineOption -AddToHistoryHandler {
+        param ([string]$Line)
+        return $Line -notmatch "^git"
+    }
+}
+
+# --- Shortcuts & Functions ---
+
+# Kill process by port
+function kp($port) {
+    $connections = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | 
+                   Where-Object { $_.OwningProcess -gt 0 }
+    if ($connections) {
+        foreach ($conn in $connections) {
+            try {
+                Stop-Process -Id $conn.OwningProcess -Force -ErrorAction Stop
+                Write-Host "Process $($conn.OwningProcess) on port $port deleted." -ForegroundColor Green
+            } catch {
+                Write-Warning "Access denied to process $($conn.OwningProcess). Run as Admin."
+            }
+        }
+    } else {
+        Write-Warning "No process listening on port $port."
+    }
+}
+
+# Unix 'touch'
+function touch($file) {
+    if (Test-Path $file) {
+        Set-ItemProperty -Path $file -Name LastWriteTime -Value (Get-Date)
+    } else {
+        New-Item -ItemType File -Path $file | Out-Null
+    }
+}
+
+# Change directory and list
+function cdd($path = $PWD) {
+    Set-Location $path
+    ls
+}
+
+# Adaptive listing
+function lsa {
+    param([Parameter(ValueFromRemainingArguments=$true)]$args)
+    $items = if ($args) { Get-ChildItem @args } else { Get-ChildItem }
+    if ($Host.UI.RawUI.WindowSize.Width -lt 60) {
+        $items | Format-Wide -Property Name -AutoSize
+    } else {
+        $items | Format-Table -AutoSize
+    }
+}
+function ls {
+    param([Parameter(ValueFromRemainingArguments=$true)]$args)
+    if ($Host.UI.RawUI.WindowSize.Width -lt 60) {
+        lsa @args
+    } else {
+        Get-ChildItem @args | Format-Table -AutoSize
+    }
+}
+
+# Git commit shortcut: `gc "message"` -> git add -A && git commit -m "message"
+function gca {
+    param(
+        [Parameter(Mandatory=$true)][string]$Message,
+        [switch]$Force
+    )
+
+    # Normalize and validate commit message
+    $Message = ($Message -replace "\r?\n"," ").Trim()
+    if ([string]::IsNullOrWhiteSpace($Message)) {
+        Write-Warning "Commit message is empty. Aborting."
+        return
+    }
+
+    # Verify git is available and we're inside a repository
+    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+        Write-Warning "git is not available in PATH."
+        return
+    }
+    $isRepo = & git rev-parse --is-inside-work-tree 2>$null
+    if ($LASTEXITCODE -ne 0 -or $isRepo -ne 'true') {
+        Write-Warning "Not inside a Git repository. Aborting."
+        return
+    }
+
+    # Ensure there are changes to commit
+    $status = & git status --porcelain
+    if (-not $status) {
+        Write-Host "No changes detected to commit." -ForegroundColor Yellow
+        return
+    }
+
+    # Stage all changes
+    & git add -A
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to stage changes (exit code $LASTEXITCODE)."
+        return
+    }
+
+    # Confirm (unless forced). Accept explicit 'y'/'yes', whitespace-only, or empty input (Enter).
+    if (-not $Force) {
+        $rawConfirm = Read-Host "Sure to add -A and commit? [y/N]"
+        $trimmed = $rawConfirm.Trim()
+        $isWhitespaceOrEmpty = ([string]::IsNullOrWhiteSpace($rawConfirm)) -or ($rawConfirm -match '^[\t \f\v]+$')
+
+        if (-not ($isWhitespaceOrEmpty -or ($trimmed -match '^[Yy](es)?$'))) {
+            Write-Host "Commit cancelled by user." -ForegroundColor Yellow
+            return
+        }
+    }
+
+    # Perform commit
+    & git commit -m $Message
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "Commit created successfully." -ForegroundColor Green
+    } else {
+        Write-Error "Commit failed (exit code $LASTEXITCODE)."
+    }
 }
