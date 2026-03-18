@@ -77,9 +77,9 @@ format = '[\[($all_status $ahead_behind)\](fg:text bg:b)]($style)'
 disabled = true
 
 [git_metrics]
-added_style = 'bg:b fg:g'
-deleted_style = 'bg:b fg:r'
-format = '[ \[+$added\]]($added_style)(bg:b fg:text)[\[-$deleted\] ]($deleted_style)'
+added_style = 'bg:base fg:g'
+deleted_style = 'bg:base fg:r'
+format = '[\[+$added\]]($added_style)[\[-$deleted\]]($deleted_style)'
 disabled = false
 
 ##########################
