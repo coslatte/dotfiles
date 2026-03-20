@@ -151,16 +151,27 @@ function gcap {
     Invoke-GitCommitWithPush -Message $Message -Force:$Force -Push:$true | Out-Null
 }
 
-# hexadecimal reading for binary files
+# hexadecimal reading for binary files with optional paging
 function hd {
     param(
         [Parameter(Mandatory=$true, Position=0)]
         [string]$Path,
-        [int]$n = 0
+        
+        [Parameter(Position=1)]
+        [int]$Count = 0
     )
-    if ($n -gt 0) {
-        Format-Hex -Path $Path -Count $n
+
+    if (-not (Test-Path $Path)) {
+        Write-Error "file not found: $Path"
+        return
+    }
+
+    if ($Count -gt 0) {
+        # display a specific number of bytes without paging
+        Format-Hex -Path $Path -Count $Count
     } else {
-        Format-Hex -Path $Path
+        # display the entire file using the 'more' pager
+        # space: next page | enter: next line | q: quit
+        Format-Hex -Path $Path | more
     }
 }
