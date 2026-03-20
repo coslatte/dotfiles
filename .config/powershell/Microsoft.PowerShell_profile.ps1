@@ -27,7 +27,7 @@ if (Get-Module PSReadLine) {
 
 # --- Shortcuts & Functions ---
 
-# Kill process by port
+# kill process by port
 function kp($port) {
     $connections = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue | 
                    Where-Object { $_.OwningProcess -gt 0 }
@@ -45,7 +45,7 @@ function kp($port) {
     }
 }
 
-# Unix 'touch'
+# unix 'touch'
 function touch($file) {
     if (Test-Path $file) {
         Set-ItemProperty -Path $file -Name LastWriteTime -Value (Get-Date)
@@ -54,7 +54,7 @@ function touch($file) {
     }
 }
 
-# Adaptive listing
+# adaptive listing
 function lsa {
     param([Parameter(ValueFromRemainingArguments=$true)]$args)
     $items = if ($args) { Get-ChildItem @args } else { Get-ChildItem }
@@ -66,7 +66,7 @@ function lsa {
 }
 
 
-# Git commit shortcut: `gca "message"` -> git add -A && git commit -m "message"
+# git commit shortcut
 function Invoke-GitCommitWithPush {
     param(
         [Parameter(Mandatory=$true)][string]$Message,
@@ -133,7 +133,7 @@ function Invoke-GitCommitWithPush {
     return 0
 }
 
-# Git commit + push shortcut: `gcap "message"` -> git add -A && git commit -m "message" && git push
+# git add -A + commit
 function gca {
     param(
         [Parameter(Mandatory=$true)][string]$Message,
@@ -142,10 +142,25 @@ function gca {
     Invoke-GitCommitWithPush -Message $Message -Force:$Force -Push:$false | Out-Null
 }
 
+# git add -A + commit + push
 function gcap {
     param(
         [Parameter(Mandatory=$true)][string]$Message,
         [switch]$Force
     )
     Invoke-GitCommitWithPush -Message $Message -Force:$Force -Push:$true | Out-Null
+}
+
+# hexadecimal reading for binary files
+function hd {
+    param(
+        [Parameter(Mandatory=$true, Position=0)]
+        [string]$Path,
+        [int]$n = 0
+    )
+    if ($n -gt 0) {
+        Format-Hex -Path $Path -Count $n
+    } else {
+        Format-Hex -Path $Path
+    }
 }
