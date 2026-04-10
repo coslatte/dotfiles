@@ -175,3 +175,9 @@ function hd {
         Format-Hex -Path $Path | more
     }
 }
+
+# utility stuff to check git history and status
+function gslog {
+    git status
+    git log -2
+}
