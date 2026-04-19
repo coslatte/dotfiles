@@ -181,3 +181,19 @@ function gslog {
     git status
     git log -2
 }
+
+function psql {
+    # config variables
+    $rootPath = "C:\Program Files\PostgreSQL"
+    $pgVersion = "16"
+
+    $psqlPath = Join-Path $rootPath "$pgVersion\bin\psql.exe"
+
+    # path existing?
+    if (Test-Path $psqlPath) {
+        & $psqlPath @args
+    }
+    else {
+        Write-Error "psql path not found: $psqlPath"
+    }
+}
