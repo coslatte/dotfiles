@@ -1,6 +1,6 @@
 # dotfiles
 
-My stuff.
+My config stuff.
 
 ## WindowsTerminal schema
 
